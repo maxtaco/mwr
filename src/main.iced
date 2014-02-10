@@ -64,7 +64,8 @@ class Runner
     @_name = @_pkg.name
     @_old_version = semver.parse @_pkg.version
     @_new_version = semver.parse(@_pkg.version).inc(@argv.inc or "patch")
-    @_new_version_s = "v" + @_new_version.toString()
+    @_new_version_s = @_new_version.toString()
+    @_new_version_vs = "v" + @_new_version_s
     cb null
 
   #-------
@@ -92,7 +93,7 @@ class Runner
     args = [ 
       "commit"
       "-m"
-      @_new_version_s
+      @_new_version_vs
       @_filename
     ]
     await @_git args, defer err
@@ -105,10 +106,10 @@ class Runner
       "tag"
       "-a"
       "-m"
-      @_new_version_s
+      @_new_version_vs
     ]
     if @_key then args.push("-u", @_key)
-    args.push @_new_version_s
+    args.push @_new_version_vs
     await @_git args, defer err
     cb err
 
@@ -172,7 +173,6 @@ About to publish:
   read_config : (cb) ->
     home = process.env.HOME or process.env.HOMEPATH or process.env.USERPROFILE
     fn = path.join home, ".mwr.json"
-    console.log fn
     await fs.readFile fn, defer err, raw
     if not err?
       await a_json_parse raw, defer err, @_config
