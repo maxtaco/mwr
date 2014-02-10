@@ -80,9 +80,9 @@ class Runner
   select_key : (cb) ->
     err = null
     if not @argv.key or @argv.key.length is 0 then # noop
-    else if not @_config?.key?
+    else if not @_config?.keys?
       err = new Error "can't use the -k flag without a config file"
-    else if not (@_key = @_config?.key?[@argv.key])?
+    else if not (@_key = @_config?.keys?[@argv.key])?
       err = new Error "don't recognize this key: #{@argv.key}"
     cb err
 
@@ -172,6 +172,7 @@ About to publish:
   read_config : (cb) ->
     home = process.env.HOME or process.env.HOMEPATH or process.env.USERPROFILE
     fn = path.join home, ".mwr.json"
+    console.log fn
     await fs.readFile fn, defer err, raw
     if not err?
       await a_json_parse raw, defer err, @_config
@@ -184,10 +185,10 @@ About to publish:
   main : (cb) ->
     esc = make_esc cb, "Runner::main"
     await @read_config esc defer()
-    await @check_clean esc defer()
     await @parse_args esc defer()
     await @read_pkg esc defer()
     await @select_key esc defer()
+    await @check_clean esc defer()
     await @verify esc defer() unless @argv.f
     await @write_new_pkg esc defer()
     await @commit esc defer()
