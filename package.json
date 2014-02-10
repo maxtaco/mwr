@@ -23,6 +23,5 @@
     "read": "*",
     "iced-error": "*"
   },
-  "homepage": "https://github.com/maxtaco/mwr",
-  "private": true
+  "homepage": "https://github.com/maxtaco/mwr"
 }
