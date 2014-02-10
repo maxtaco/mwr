@@ -21,10 +21,10 @@
   "dependencies": {
     "semver": "~2.2.1",
     "iced-coffee-script": "~1.7.1-a",
-    "iced-utils": "~0.1.8",
+    "iced-utils": "~0.1.9",
     "minimist": "~0.0.7",
-    "read": "*",
-    "iced-error": "*"
+    "read": "~1.0.5",
+    "iced-error": "~0.0.8"
   },
   "homepage": "https://github.com/maxtaco/mwr"
 }
