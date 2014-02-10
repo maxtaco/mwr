@@ -7,6 +7,7 @@ parse_args = require 'minimist'
 read = require 'read'
 {make_esc} = require 'iced-error'
 fs = require 'fs'
+path = require 'path'
 
 #==================================================================
 
@@ -18,6 +19,7 @@ class Runner
     @_new_version = null
     @_name = null
     @_filename = "./package.json"
+    @_config = null
 
   #-------
 
@@ -77,12 +79,11 @@ class Runner
 
   select_key : (cb) ->
     err = null
-    @_key = if not @argv.key or @argv.key.length is 0 then null
-    else if @argv.key in [ "1", "keybase", "kb", "code" ] then "code@keybase.io"
-    else if @argv.key in [ "2", "themax", "max", "me", "gmail" ] then "themax@gmail.com"
-    else 
+    if not @argv.key or @argv.key.length is 0 then # noop
+    else if not @_config?.key?
+      err = new Error "can't use the -k flag without a config file"
+    else if not (@_key = @_config?.key?[@argv.key])?
       err = new Error "don't recognize this key: #{@argv.key}"
-      null
     cb err
 
   #-------
@@ -168,8 +169,21 @@ About to publish:
 
   #-------
 
+  read_config : (cb) ->
+    home = process.env.HOME or process.env.HOMEPATH or process.env.USERPROFILE
+    fn = path.join home, ".mwr.json"
+    await fs.readFile fn, defer err, raw
+    if not err?
+      await a_json_parse raw, defer err, @_config
+    else if err.code is 'ENOENT'
+      err = null
+    cb err
+
+  #-------
+
   main : (cb) ->
     esc = make_esc cb, "Runner::main"
+    await @read_config esc defer()
     await @check_clean esc defer()
     await @parse_args esc defer()
     await @read_pkg esc defer()

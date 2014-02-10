@@ -1,5 +1,5 @@
 {
-  "name": "release",
+  "name": "mwr",
   "version": "v0.0.6",
   "description": "A script to automate release of software",
   "main": "bin/main.js",
@@ -8,12 +8,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/maxtaco/release"
+    "url": "git://github.com/maxtaco/mwr"
   },
   "author": "Maxwell Krohn",
   "license": "BSD-3-Clause",
   "bugs": {
-    "url": "https://github.com/maxtaco/release/issues"
+    "url": "https://github.com/maxtaco/mwr/issues"
   },
   "dependencies": {
     "semver": "~2.2.1",
@@ -23,6 +23,6 @@
     "read": "*",
     "iced-error": "*"
   },
-  "homepage": "https://github.com/maxtaco/release",
+  "homepage": "https://github.com/maxtaco/mwr",
   "private": true
 }
