@@ -1,7 +1,7 @@
 
 semver = require 'semver'
 iutils = require 'iced-utils'
-{spawn} = iutils.spawn
+{Child,spawn} = iutils.spawn
 {a_json_parse} = iutils.util
 parse_args = require 'minimist'
 read = require 'read'
@@ -18,6 +18,27 @@ class Runner
     @_new_version = null
     @_name = null
     @_filename = "./package.json"
+
+  #-------
+
+  check_clean : (cb) ->
+    args = [
+      "status"
+      "--porcelain"
+    ]
+    buf = []
+    err = null
+    child = new Child args, { quiet : true, interp : 'git' }
+    child.filter (f) -> buf.push f
+    await child.run().wait defer rc
+    if rc isnt 0
+      err = new Error "git status failed with error #{rc}"
+    else
+      b = Buffer.concat(buf).toString('utf8')
+      if b.match /\S/
+        err = new Error "refusing to push; directory is unclean"
+        console.log b
+    cb err
 
   #-------
 
@@ -41,7 +62,7 @@ class Runner
     @_name = @_pkg.name
     @_old_version = semver.parse @_pkg.version
     @_new_version = semver.parse(@_pkg.version).inc(@argv.inc or "patch")
-    @_new_version_s = @_new_version.toString()
+    @_new_version_s = "v" + @_new_version.toString()
     cb null
 
   #-------
@@ -135,8 +156,21 @@ About to publish:
 
   #-------
 
+  push : (cb) ->
+    args = [
+      "push"
+      "--tags"
+      "origin"
+      "master"
+    ]
+    await @_git args, defer err
+    cb err
+
+  #-------
+
   main : (cb) ->
     esc = make_esc cb, "Runner::main"
+    await @check_clean esc defer()
     await @parse_args esc defer()
     await @read_pkg esc defer()
     await @select_key esc defer()
@@ -144,6 +178,7 @@ About to publish:
     await @write_new_pkg esc defer()
     await @commit esc defer()
     await @tag esc defer()
+    await @push esc defer()
     await @publish esc defer()
     cb null
 
