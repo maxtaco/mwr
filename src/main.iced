@@ -169,7 +169,7 @@ About to publish:
     esc = make_esc cb, "dir_sign"
     await @_keybase [ "dir", "sign"], esc defer()
     await @commit @_dir_sign_file, esc defer()
-    cb err
+    cb null
 
   #-------
 
