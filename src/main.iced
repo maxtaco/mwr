@@ -73,10 +73,12 @@ class Runner
   #-------
 
   write_new_pkg : (cb) ->
+    esc = make_esc cb, "write_new_pkg"
     @_pkg.version = @_new_version_s
     json = JSON.stringify @_pkg, null, "  "
-    await fs.writeFile @_filename, json, defer err
-    cb err
+    await fs.writeFile @_filename, json, esc defer()
+    await @stage @_filename, esc defer()
+    cb null
 
   #-------
 
@@ -91,12 +93,18 @@ class Runner
 
   #-------
 
-  commit : (fn, cb) ->
+  stage : (fn, cb) ->
+    args = [ "add", fn ]
+    await @_git args, defer err
+    cb err
+
+  #-------
+
+  commit : (cb) ->
     args = [ 
       "commit"
       "-m"
       @_new_version_vs
-      fn
     ]
     await @_git args, defer err
     cb err
@@ -168,7 +176,7 @@ About to publish:
   dir_sign : (cb) ->
     esc = make_esc cb, "dir_sign"
     await @_keybase [ "dir", "sign"], esc defer()
-    await @commit @_dir_sign_file, esc defer()
+    await @stage @_dir_sign_file, esc defer()
     cb null
 
   #-------
@@ -207,7 +215,7 @@ About to publish:
     await @verify esc defer() unless @argv.f
     await @write_new_pkg esc defer()
     await @dir_sign esc defer() unless @argv.S
-    await @commit @_filename, esc defer()
+    await @commit esc defer()
     await @tag esc defer()
     await @push esc defer()
     await @publish esc defer()
