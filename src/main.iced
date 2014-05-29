@@ -50,7 +50,8 @@ class Runner
         k : [ "key" ]
         f : [ "force" ]
         i : [ "inc" ]
-      boolean : [ "f" ]
+        S : [ "no-dir-sign" ]
+      boolean : [ "f", "S" ]
       string : [ "i" ]
     }
     cb null
@@ -140,12 +141,17 @@ About to publish:
 
   #-------
 
-  _git : (args, cb) ->
-    opts = { interp : "git" }
+  _cmd : (name, args, cb) ->
+    opts = { interp : name }
     s = args.join(" ")
     await spawn args, defer(rc), opts
-    err = if rc isnt 0 then new Error "git #{s}: bad exit: #{rc}" else null
+    err = if rc isnt 0 then new Error "#{name} #{s}: bad exit: #{rc}" else null
     cb err
+
+  #-------
+
+  _git : (args, cb) -> @_cmd "git", args, cb
+  _keybase : (args, cb) -> @_cmd "keybase", args, cb
 
   #-------
 
@@ -154,6 +160,12 @@ About to publish:
     s = args.join(" ")
     await spawn args, defer(rc), opts
     err = if rc isnt 0 then new Error "npm #{s}: bad exit: #{rc}" else null
+    cb err
+
+  #-------
+
+  dir_sign : (cb) ->
+    await @_keybase [ "dir", "sign"], defer err
     cb err
 
   #-------
@@ -191,6 +203,7 @@ About to publish:
     await @check_clean esc defer()
     await @verify esc defer() unless @argv.f
     await @write_new_pkg esc defer()
+    await @dir_sign esc defer() unless @argv.S
     await @commit esc defer()
     await @tag esc defer()
     await @push esc defer()
