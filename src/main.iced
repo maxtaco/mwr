@@ -19,6 +19,7 @@ class Runner
     @_new_version = null
     @_name = null
     @_filename = "./package.json"
+    @_dir_sign_file = "./SIGNED.md"
     @_config = null
 
   #-------
@@ -90,12 +91,12 @@ class Runner
 
   #-------
 
-  commit : (cb) ->
+  commit : (fn, cb) ->
     args = [ 
       "commit"
       "-m"
       @_new_version_vs
-      @_filename
+      fn
     ]
     await @_git args, defer err
     cb err
@@ -165,7 +166,9 @@ About to publish:
   #-------
 
   dir_sign : (cb) ->
-    await @_keybase [ "dir", "sign"], defer err
+    esc = make_esc cb, "dir_sign"
+    await @_keybase [ "dir", "sign"], esc defer()
+    await @commit @_dir_sign_file, esc defer()
     cb err
 
   #-------
@@ -204,7 +207,7 @@ About to publish:
     await @verify esc defer() unless @argv.f
     await @write_new_pkg esc defer()
     await @dir_sign esc defer() unless @argv.S
-    await @commit esc defer()
+    await @commit @_filename, esc defer()
     await @tag esc defer()
     await @push esc defer()
     await @publish esc defer()
