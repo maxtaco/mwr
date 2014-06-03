@@ -52,7 +52,8 @@ class Runner
         f : [ "force" ]
         i : [ "inc" ]
         S : [ "no-dir-sign" ]
-      boolean : [ "f", "S" ]
+        I : [ "no-increment" ]
+      boolean : [ "f", "S", "I" ]
       string : [ "i" ]
     }
     cb null
@@ -65,7 +66,15 @@ class Runner
     await a_json_parse raw, esc defer @_pkg
     @_name = @_pkg.name
     @_old_version = semver.parse @_pkg.version
-    @_new_version = semver.parse(@_pkg.version).inc(@argv.inc or "patch")
+    cb null
+
+  #-------
+
+  inc_version : (cb) ->
+    if @argv.no_increment
+      @_new_version = @_pkg.version
+    else
+      @_new_version = semver.parse(@_pkg.version).inc(@argv.inc or "patch")
     @_new_version_s = @_new_version.toString()
     @_new_version_vs = "v" + @_new_version_s
     cb null
@@ -74,10 +83,11 @@ class Runner
 
   write_new_pkg : (cb) ->
     esc = make_esc cb, "write_new_pkg"
-    @_pkg.version = @_new_version_s
-    json = JSON.stringify @_pkg, null, "  "
-    await fs.writeFile @_filename, json, esc defer()
-    await @stage @_filename, esc defer()
+    unless @argv.no_increment
+      @_pkg.version = @_new_version_s
+      json = JSON.stringify @_pkg, null, "  "
+      await fs.writeFile @_filename, json, esc defer()
+      await @git_stage @_filename, esc defer()
     cb null
 
   #-------
@@ -93,7 +103,7 @@ class Runner
 
   #-------
 
-  stage : (fn, cb) ->
+  git_stage : (fn, cb) ->
     args = [ "add", fn ]
     await @_git args, defer err
     cb err
@@ -176,7 +186,7 @@ About to publish:
   dir_sign : (cb) ->
     esc = make_esc cb, "dir_sign"
     await @_keybase [ "dir", "sign"], esc defer()
-    await @stage @_dir_sign_file, esc defer()
+    await @git_stage @_dir_sign_file, esc defer()
     cb null
 
   #-------
@@ -210,6 +220,7 @@ About to publish:
     await @read_config esc defer()
     await @parse_args esc defer()
     await @read_pkg esc defer()
+    await @inc_version esc defer()
     await @select_key esc defer()
     await @check_clean esc defer()
     await @verify esc defer() unless @argv.f
