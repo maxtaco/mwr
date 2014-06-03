@@ -71,11 +71,8 @@ class Runner
   #-------
 
   inc_version : (cb) ->
-    console.log "shit"
-    console.log @argv
-    if @argv.no_increment
+    if @argv.I
       @_new_version = @_pkg.version
-      console.log "foooo"
     else
       @_new_version = semver.parse(@_pkg.version).inc(@argv.inc or "patch")
     @_new_version_s = @_new_version.toString()
@@ -86,7 +83,7 @@ class Runner
 
   write_new_pkg : (cb) ->
     esc = make_esc cb, "write_new_pkg"
-    unless @argv.no_increment
+    unless @argv.I
       @_pkg.version = @_new_version_s
       json = JSON.stringify @_pkg, null, "  "
       await fs.writeFile @_filename, json, esc defer()
