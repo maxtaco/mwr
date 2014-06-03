@@ -71,8 +71,10 @@ class Runner
   #-------
 
   inc_version : (cb) ->
+    console.log "shit"
     if @argv.no_increment
       @_new_version = @_pkg.version
+      console.log "foooo"
     else
       @_new_version = semver.parse(@_pkg.version).inc(@argv.inc or "patch")
     @_new_version_s = @_new_version.toString()
