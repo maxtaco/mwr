@@ -72,6 +72,7 @@ class Runner
 
   inc_version : (cb) ->
     console.log "shit"
+    console.log @argv
     if @argv.no_increment
       @_new_version = @_pkg.version
       console.log "foooo"
