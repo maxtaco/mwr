@@ -144,7 +144,7 @@ About to publish:
   * Signing key: #{@_key}
 """
     args = 
-      prompt : "Are you sure? [Y/n] "
+      prompt : "Are you sure? [y/N] "
     await read args, defer err, res
     err = if err? then err
     else if res.toLowerCase() in [ "y", "yes" ] then null
