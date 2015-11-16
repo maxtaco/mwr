@@ -47,7 +47,7 @@ class Runner
 
   parse_args : (cb) ->
     @argv = parse_args process.argv[2...], {
-      alias : 
+      alias :
         k : [ "key" ]
         f : [ "force" ]
         i : [ "inc" ]
@@ -111,7 +111,7 @@ class Runner
   #-------
 
   commit : (cb) ->
-    args = [ 
+    args = [
       "commit"
       "-m"
       @_new_version_vs
@@ -143,7 +143,7 @@ About to publish:
   * New version: #{@_new_version.toString()}
   * Signing key: #{@_key}
 """
-    args = 
+    args =
       prompt : "Are you sure? [y/N] "
     await read args, defer err, res
     err = if err? then err
@@ -153,7 +153,7 @@ About to publish:
 
   #-------
 
-  publish : (cb) -> 
+  publish : (cb) ->
     args = [ "publish" ]
     await @_npm args, defer err
     cb err
@@ -226,7 +226,7 @@ About to publish:
     await @verify esc defer() unless @argv.f
     await @write_new_pkg esc defer()
     await @dir_sign esc defer() unless @argv.S
-    await @commit esc defer()
+    await @commit esc defer() unless (@argv.S and @argv.I)
     await @tag esc defer()
     await @push esc defer()
     await @publish esc defer()

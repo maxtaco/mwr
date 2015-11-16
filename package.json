@@ -19,12 +19,13 @@
     "url": "https://github.com/maxtaco/mwr/issues"
   },
   "dependencies": {
-    "semver": "~2.2.1",
-    "iced-coffee-script": "~1.7.1-a",
+    "iced-coffee-script": "^108.0.9",
+    "iced-error": "~0.0.8",
+    "iced-runtime": "^1.0.3",
     "iced-utils": "~0.1.9",
     "minimist": "~0.0.7",
     "read": "~1.0.5",
-    "iced-error": "~0.0.8"
+    "semver": "~2.2.1"
   },
   "homepage": "https://github.com/maxtaco/mwr"
 }
