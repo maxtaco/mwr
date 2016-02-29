@@ -11,6 +11,10 @@ path = require 'path'
 
 #==================================================================
 
+bufferify = (s) ->  if typeof(s) is 'string' then (new Buffer s, 'utf8') else s
+
+#==================================================================
+
 class Runner
 
   constructor : () ->
@@ -19,7 +23,6 @@ class Runner
     @_new_version = null
     @_name = null
     @_filename = "./package.json"
-    @_dir_sign_file = "./SIGNED.md"
     @_config = null
 
   #-------
@@ -32,7 +35,7 @@ class Runner
     buf = []
     err = null
     child = new Child args, { quiet : true, interp : 'git' }
-    child.filter (f) -> buf.push f
+    child.filter (f) -> buf.push bufferify f
     await child.run().wait defer rc
     if rc isnt 0
       err = new Error "git status failed with error #{rc}"
@@ -183,14 +186,6 @@ About to publish:
 
   #-------
 
-  dir_sign : (cb) ->
-    esc = make_esc cb, "dir_sign"
-    await @_keybase [ "dir", "sign"], esc defer()
-    await @git_stage @_dir_sign_file, esc defer()
-    cb null
-
-  #-------
-
   push : (cb) ->
     args = [
       "push"
@@ -225,8 +220,7 @@ About to publish:
     await @check_clean esc defer()
     await @verify esc defer() unless @argv.f
     await @write_new_pkg esc defer()
-    await @dir_sign esc defer() unless @argv.S
-    await @commit esc defer() unless (@argv.S and @argv.I)
+    await @commit esc defer() unless @argv.I
     await @tag esc defer()
     await @push esc defer()
     await @publish esc defer()
