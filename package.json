@@ -25,7 +25,7 @@
     "iced-utils": "~0.1.9",
     "minimist": "~0.0.7",
     "read": "~1.0.5",
-    "semver": "~2.2.1"
+    "semver": "^5.6.0"
   },
   "homepage": "https://github.com/maxtaco/mwr"
 }
