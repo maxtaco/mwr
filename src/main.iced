@@ -159,7 +159,7 @@ About to publish:
 
   publish : (cb) ->
     args = [ "publish" ]
-    if @argv.o? then args.push "-o", @argv.o
+    if @argv.o? then args.push "--otp", @argv.o
     await @_npm args, defer err
     cb err
 
