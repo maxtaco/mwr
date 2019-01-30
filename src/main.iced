@@ -56,8 +56,9 @@ class Runner
         i : [ "inc" ]
         S : [ "no-dir-sign" ]
         I : [ "no-increment" ]
+        o : [ "otp" ]
       boolean : [ "f", "S", "I" ]
-      string : [ "i" ]
+      string : [ "i", "o" ]
     }
     cb null
 
@@ -158,6 +159,7 @@ About to publish:
 
   publish : (cb) ->
     args = [ "publish" ]
+    if @argv.o? then args.push "-o", @argv.o
     await @_npm args, defer err
     cb err
 
