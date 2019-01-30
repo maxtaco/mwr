@@ -1,6 +1,6 @@
 {
   "name": "mwr",
-  "version": "0.0.20",
+  "version": "0.0.21",
   "description": "A script to automate release of software",
   "main": "lib/main.js",
   "scripts": {
