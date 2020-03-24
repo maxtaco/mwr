@@ -23,7 +23,7 @@
     "iced-error": "~0.0.8",
     "iced-runtime": "^1.0.3",
     "iced-utils": "~0.1.9",
-    "minimist": "~0.0.7",
+    "minimist": "~1.2.2",
     "read": "~1.0.5",
     "semver": "^5.6.0"
   },
